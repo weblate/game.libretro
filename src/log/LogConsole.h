@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2014-2016 Team Kodi
+ *      Copyright (C) 2014-2018 Team Kodi
  *      Portions Copyright (C) 2013-2014 Lars Op den Kamp
  *
  *  This Program is free software; you can redistribute it and/or modify
