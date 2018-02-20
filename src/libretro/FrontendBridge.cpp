@@ -27,7 +27,9 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <kodi/Filesystem.h>
 #include <kodi/General.h>
+#include <stdio.h>
 
 using namespace LIBRETRO;
 
@@ -344,4 +346,179 @@ void CFrontendBridge::LocationInitialized(void)
 void CFrontendBridge::LocationDeinitialized(void)
 {
   // Not implemented
+}
+
+const char *CFrontendBridge::GetPath(retro_vfs_file_handle *stream)
+{
+  if (stream == nullptr)
+    return "";
+
+  FileHandle *fileHandle = reinterpret_cast<FileHandle*>(stream);
+
+  return fileHandle->path.c_str();
+}
+
+retro_vfs_file_handle *CFrontendBridge::OpenFile(const char *path, unsigned mode, unsigned hints)
+{
+  if (path == nullptr)
+    return nullptr;
+
+  std::unique_ptr<FileHandle> fileHandle(new FileHandle{ path });
+  fileHandle->file.reset(new kodi::vfs::CFile);
+
+  bool bRead = true;
+
+  switch (mode)
+  {
+  case RETRO_VFS_FILE_ACCESS_READ:
+    bRead = true;
+    break;
+  case RETRO_VFS_FILE_ACCESS_WRITE:
+    bRead = false;
+    break;
+  case RETRO_VFS_FILE_ACCESS_READ_WRITE:
+    return nullptr; // TODO
+  case RETRO_VFS_FILE_ACCESS_UPDATE_EXISTING:
+    return nullptr; // TODO
+  default:
+    return nullptr;
+  }
+
+  if (bRead)
+  {
+    unsigned int flags = 0;
+
+    // TODO
+    //flags &= READ_TRUNCATED;
+
+    if (hints & RETRO_VFS_FILE_ACCESS_HINT_FREQUENT_ACCESS)
+      flags &= READ_CACHED;
+
+    if (!fileHandle->file->OpenFile(fileHandle->path, flags))
+      return nullptr;
+  }
+  else
+  {
+    if (!fileHandle->file->OpenFileForWrite(fileHandle->path, false))
+      return nullptr;
+  }
+
+  return reinterpret_cast<retro_vfs_file_handle*>(fileHandle.release());
+}
+
+int CFrontendBridge::CloseFile(retro_vfs_file_handle *stream)
+{
+  if (stream == nullptr)
+    return -1;
+
+  FileHandle *fileHandle = reinterpret_cast<FileHandle*>(stream);
+
+  fileHandle->file->Close();
+  delete fileHandle;
+
+  return 0;
+}
+
+int64_t CFrontendBridge::FileSize(retro_vfs_file_handle *stream)
+{
+  if (stream == nullptr)
+    return -1;
+
+  FileHandle *fileHandle = reinterpret_cast<FileHandle*>(stream);
+
+  return fileHandle->file->GetLength();
+}
+
+int64_t CFrontendBridge::GetPosition(retro_vfs_file_handle *stream)
+{
+  if (stream == nullptr)
+    return -1;
+
+  FileHandle *fileHandle = reinterpret_cast<FileHandle*>(stream);
+
+  return fileHandle->file->GetPosition();
+}
+
+int64_t CFrontendBridge::Seek(retro_vfs_file_handle *stream, int64_t offset, int seek_position)
+{
+  if (stream == nullptr)
+    return -1;
+
+  FileHandle *fileHandle = reinterpret_cast<FileHandle*>(stream);
+
+  int whence = -1;
+
+  switch (seek_position)
+  {
+  case RETRO_VFS_SEEK_POSITION_START:
+    whence = SEEK_SET;
+    break;
+  case RETRO_VFS_SEEK_POSITION_CURRENT:
+    whence = SEEK_CUR;
+    break;
+  case RETRO_VFS_SEEK_POSITION_END:
+    whence = SEEK_END;
+    break;
+  default:
+    break;
+  }
+
+  if (whence == -1)
+    return -1;
+
+  return fileHandle->file->Seek(offset, whence);
+}
+
+int64_t CFrontendBridge::ReadFile(retro_vfs_file_handle *stream, void *s, uint64_t len)
+{
+  if (stream == nullptr)
+    return -1;
+
+  FileHandle *fileHandle = reinterpret_cast<FileHandle*>(stream);
+
+  return static_cast<int64_t>(fileHandle->file->Read(s, static_cast<size_t>(len)));
+}
+
+int64_t CFrontendBridge::WriteFile(retro_vfs_file_handle *stream, const void *s, uint64_t len)
+{
+  if (stream == nullptr)
+    return -1;
+
+  FileHandle *fileHandle = reinterpret_cast<FileHandle*>(stream);
+
+  return static_cast<int64_t>(fileHandle->file->Write(s, static_cast<size_t>(len)));
+}
+
+int CFrontendBridge::FlushFile(retro_vfs_file_handle *stream)
+{
+  if (stream == nullptr)
+    return -1;
+
+  FileHandle *fileHandle = reinterpret_cast<FileHandle*>(stream);
+
+  fileHandle->file->Flush();
+
+  return 0;
+}
+
+int CFrontendBridge::RemoveFile(const char *path)
+{
+  if (path == nullptr)
+    return -1;
+
+  if (!kodi::vfs::DeleteFile(path))
+    return -1;
+
+  return 0;
+}
+
+int CFrontendBridge::RenameFile(const char *old_path, const char *new_path)
+{
+  if (old_path == nullptr || new_path == nullptr)
+    return -1;
+
+  if (!kodi::vfs::RenameFile(old_path, new_path))
+    return -1;
+
+  return 0;
 }
