@@ -531,30 +531,40 @@ size_t SerializeSize(void)
   return CLIENT->retro_serialize_size();
 }
 
-GAME_ERROR Serialize(uint8_t* data, size_t size)
+GAME_ERROR Serialize(const game_stream_memory_buffer &buffer)
 {
   if (!CLIENT)
     return GAME_ERROR_FAILED;
 
-  if (data == nullptr)
+  if (buffer.data == nullptr)
     return GAME_ERROR_INVALID_PARAMETERS;
 
-  bool result = CLIENT->retro_serialize(data, size);
+  bool result = CLIENT->retro_serialize(buffer.data, buffer.size);
 
   return result ? GAME_ERROR_NO_ERROR : GAME_ERROR_FAILED;
 }
 
-GAME_ERROR Deserialize(const uint8_t* data, size_t size)
+GAME_ERROR Deserialize(const game_stream_memory_packet &packet)
 {
   if (!CLIENT)
     return GAME_ERROR_FAILED;
 
-  if (data == nullptr)
+  if (packet.data == nullptr)
     return GAME_ERROR_INVALID_PARAMETERS;
 
-  bool result = CLIENT->retro_unserialize(data, size);
+  bool result = CLIENT->retro_unserialize(packet.data, packet.size);
 
   return result ? GAME_ERROR_NO_ERROR : GAME_ERROR_FAILED;
+}
+
+GAME_ERROR EnableMemoryStream()
+{
+  return GAME_ERROR_NOT_IMPLEMENTED; // TODO
+}
+
+void DisableMemoryStream()
+{
+  // TODO
 }
 
 GAME_ERROR CheatReset(void)
