@@ -118,6 +118,11 @@ std::string CLibretroEnvironment::GetResourcePath(const char* relPath)
   return m_resources.GetFullPath(relPath);
 }
 
+void CLibretroEnvironment::OnFrameBegin()
+{
+  m_videoStream.OnFrameBegin();
+}
+
 void CLibretroEnvironment::OnFrameEnd()
 {
   m_videoStream.OnFrameEnd();
