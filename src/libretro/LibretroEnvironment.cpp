@@ -655,6 +655,110 @@ bool CLibretroEnvironment::EnvironmentCallback(unsigned int cmd, void *data)
     }
     break;
   }
+  case RETRO_ENVIRONMENT_GET_AUDIO_VIDEO_ENABLE:
+  {
+    int* typedData = reinterpret_cast<int*>(data);
+    if (typedData)
+    {
+      int& avflags = *typedData;
+
+      // Bit 0: Enable video
+      // TODO: Disable if hidden
+      avflags |= (1 << 0);
+
+      // Bit 1: Enable audio
+      // TODO: Disable if muted
+      avflags |= (1 << 1);
+
+      // Bit 2: Use fast savestates
+      // TODO: Add fast savestate support
+
+      // Bit 3: Hard disable audio
+      avflags &= ~(1 << 3);
+    }
+    break;
+  }
+  case RETRO_ENVIRONMENT_GET_MIDI_INTERFACE:
+  {
+    retro_midi_interface** typedData = reinterpret_cast<retro_midi_interface**>(data);
+    if (typedData)
+    {
+      // Not implemented
+      return false;
+    }
+    break;
+  }
+  case RETRO_ENVIRONMENT_GET_FASTFORWARDING:
+  {
+    bool* typedData = reinterpret_cast<bool*>(data);
+    if (typedData)
+    {
+      // Not implemented
+      return false;
+    }
+    break;
+  }
+  case RETRO_ENVIRONMENT_GET_TARGET_REFRESH_RATE:
+  {
+    float* typedData = reinterpret_cast<float*>(data);
+    if (typedData)
+    {
+      // Not implemented
+      return false;
+    }
+    break;
+  }
+  case RETRO_ENVIRONMENT_GET_INPUT_BITMASKS:
+  {
+    bool* typedData = reinterpret_cast<bool*>(data);
+    if (typedData)
+    {
+      // Not supported. In the future, this can be used to speed up input
+      // polling.
+      *typedData = false;
+    }
+    break;
+  }
+  case RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION:
+  {
+    unsigned int* typedData = reinterpret_cast<unsigned int*>(data);
+    if (typedData)
+    {
+      // Core options version 1 not supported yet
+      *typedData = 0;
+    }
+    break;
+  }
+  case RETRO_ENVIRONMENT_SET_CORE_OPTIONS:
+  {
+    const retro_core_option_definition** typedData = reinterpret_cast<const retro_core_option_definition**>(data);
+    if (typedData)
+    {
+      // Not implemented
+      return false;
+    }
+    break;
+  }
+  case RETRO_ENVIRONMENT_SET_CORE_OPTIONS_INTL:
+  {
+    const retro_core_options_intl* typedData = reinterpret_cast<const retro_core_options_intl*>(data);
+    if (typedData)
+    {
+      // Not implemented
+      return false;
+    }
+    break;
+  }
+  case RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY:
+  {
+    retro_core_option_display* typedData = reinterpret_cast<retro_core_option_display*>(data);
+    if (typedData)
+    {
+      // Not implemented
+      return false;
+    }
+    break;
+  }
   default:
     return false;
   }
