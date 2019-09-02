@@ -569,8 +569,45 @@ bool CLibretroEnvironment::EnvironmentCallback(unsigned int cmd, void *data)
     uint64_t* typedData = reinterpret_cast<uint64_t*>(data);
     if (typedData)
     {
-      // Not implemented
-      return false;
+      uint64_t& quirkMask = *typedData;
+
+      // TODO: Report information to Kodi
+      kodi::Log(ADDON_LOG_DEBUG, "Detected serialization quarks:");
+
+      if (quirkMask & RETRO_SERIALIZATION_QUIRK_INCOMPLETE)
+      {
+        // State is incomplete, can't be used for features like netplay
+        kodi::Log(ADDON_LOG_DEBUG, "Incomplete state (no netplay)");
+      }
+      if (quirkMask & RETRO_SERIALIZATION_QUIRK_MUST_INITIALIZE)
+      {
+        // Serialization will fail until the core is ready to serialize
+        kodi::Log(ADDON_LOG_DEBUG, "Deferred initialization");
+      }
+      if (quirkMask & RETRO_SERIALIZATION_QUIRK_CORE_VARIABLE_SIZE)
+      {
+        // Serialization size may change
+        kodi::Log(ADDON_LOG_DEBUG, "Variable serialization size");
+      }
+
+      // TODO: Support variable-sized states
+      quirkMask &= ~RETRO_SERIALIZATION_QUIRK_FRONT_VARIABLE_SIZE;
+
+      if (quirkMask & RETRO_SERIALIZATION_QUIRK_SINGLE_SESSION)
+      {
+        // State requires session context
+        kodi::Log(ADDON_LOG_DEBUG, "Requires session");
+      }
+      if (quirkMask & RETRO_SERIALIZATION_QUIRK_ENDIAN_DEPENDENT)
+      {
+        // Serialized state depends on architecture endianness
+        kodi::Log(ADDON_LOG_DEBUG, "Endian-dependent");
+      }
+      if (quirkMask & RETRO_SERIALIZATION_QUIRK_PLATFORM_DEPENDENT)
+      {
+        // Serialized state depends on a platform detail, such as word size
+        kodi::Log(ADDON_LOG_DEBUG, "Platform-dependent");
+      }
     }
     break;
   }
