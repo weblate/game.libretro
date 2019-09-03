@@ -27,6 +27,9 @@
 #include <string>
 
 class CGameLibRetro;
+struct retro_core_option_definition;
+struct retro_core_option_display;
+struct retro_core_options_intl;
 struct retro_variable;
 
 namespace LIBRETRO
@@ -47,6 +50,11 @@ namespace LIBRETRO
     const char* GetCurrentValue(const std::string& settingName);
 
     void SetCurrentValue(const std::string& name, const std::string& value);
+
+    // Core options API
+    void SetCoreOptions(const retro_core_option_definition** options);
+    void SetCoreOptionsIntl(const retro_core_options_intl* options);
+    void SetVisibility(const retro_core_option_display* option);
 
   private:
     /*!

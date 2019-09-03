@@ -162,6 +162,21 @@ void CLibretroSettings::SetCurrentValue(const std::string& name, const std::stri
     GenerateSettings();
 }
 
+void CLibretroSettings::SetCoreOptions(const retro_core_option_definition** options)
+{
+  // TODO
+}
+
+void CLibretroSettings::SetCoreOptionsIntl(const retro_core_options_intl* options)
+{
+  // TODO
+}
+
+void CLibretroSettings::SetVisibility(const retro_core_option_display* option)
+{
+  // TODO
+}
+
 void CLibretroSettings::GenerateSettings()
 {
   if (!m_bGenerated && !m_settings.empty())

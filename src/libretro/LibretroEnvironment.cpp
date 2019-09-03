@@ -724,8 +724,8 @@ bool CLibretroEnvironment::EnvironmentCallback(unsigned int cmd, void *data)
     unsigned int* typedData = reinterpret_cast<unsigned int*>(data);
     if (typedData)
     {
-      // Core options version 1 not supported yet
-      *typedData = 0;
+      // Core options API version 1
+      *typedData = 1;
     }
     break;
   }
@@ -734,8 +734,7 @@ bool CLibretroEnvironment::EnvironmentCallback(unsigned int cmd, void *data)
     const retro_core_option_definition** typedData = reinterpret_cast<const retro_core_option_definition**>(data);
     if (typedData)
     {
-      // Not implemented
-      return false;
+      m_settings.SetCoreOptions(typedData);
     }
     break;
   }
@@ -744,8 +743,7 @@ bool CLibretroEnvironment::EnvironmentCallback(unsigned int cmd, void *data)
     const retro_core_options_intl* typedData = reinterpret_cast<const retro_core_options_intl*>(data);
     if (typedData)
     {
-      // Not implemented
-      return false;
+      m_settings.SetCoreOptionsIntl(typedData);
     }
     break;
   }
@@ -754,8 +752,7 @@ bool CLibretroEnvironment::EnvironmentCallback(unsigned int cmd, void *data)
     retro_core_option_display* typedData = reinterpret_cast<retro_core_option_display*>(data);
     if (typedData)
     {
-      // Not implemented
-      return false;
+      m_settings.SetVisibility(typedData);
     }
     break;
   }
